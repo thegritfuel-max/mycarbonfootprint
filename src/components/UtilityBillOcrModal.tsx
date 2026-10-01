@@ -338,63 +338,20 @@ export const UtilityBillOcrModal: React.FC<UtilityBillOcrModalProps> = ({
                   setRawExtractedText(e.target.value);
                   parseTextAndCalculate(e.target.value);
                 }}
-                rows={5}
-                className="w-full bg-transparent text-xs font-mono text-slate-300 focus:outline-none resize-none border border-slate-800 p-2 rounded-xl"
+                rows={6}
+                className="w-full bg-transparent text-xs font-mono text-slate-300 focus:outline-none resize-none border border-slate-800 p-3 rounded-xl"
                 placeholder="Pasted or OCR extracted text string..."
               />
             </div>
 
-            {/* Matched Text String & Formula Display */}
-            <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl space-y-3">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                <h3 className="font-['Syne'] text-sm font-bold text-slate-900">Extracted String & Carbon Formula Result</h3>
-              </div>
-
-              {/* Highlighted Matched Line */}
-              <div className="bg-slate-900 text-lime-400 p-3 rounded-xl font-mono text-xs border border-slate-800">
-                <span className="text-slate-400 block text-[10px] uppercase font-sans font-bold">Detected Electricity Line String:</span>
-                <span className="font-bold text-white font-mono">"{parsedMetrics.matchedKwhLine}"</span>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-3.5 rounded-xl border border-emerald-100">
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Consumer ID</span>
-                  <span className="text-xs font-bold text-slate-900">{parsedMetrics.consumerNumber}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Extracted kWh</span>
-                  <span className="text-sm font-extrabold text-emerald-700 tabular-nums">{parsedMetrics.kwhConsumed.toLocaleString()} kWh</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Bill Amount</span>
-                  <span className="text-xs font-bold text-slate-900">₹{parsedMetrics.totalAmount.toLocaleString()}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Calculated Footprint</span>
-                  <span className="text-sm font-extrabold text-slate-900 tabular-nums">{parsedMetrics.calculatedCo2eTonnes} Tonnes</span>
-                </div>
-              </div>
-
-              {/* Exact Formula Applied */}
-              <div className="text-[11px] text-emerald-900 bg-emerald-100/80 p-3 rounded-xl font-mono space-y-1">
-                <span className="font-bold block text-slate-900 font-sans">Formula Engine Applied:</span>
-                <div>
-                  Emissions = Extracted kWh ({parsedMetrics.kwhConsumed.toLocaleString()}) × 0.82 kg CO2e/kWh
-                </div>
-                <div className="font-bold text-emerald-800">
-                  = {parsedMetrics.calculatedCo2eKg.toLocaleString()} kg CO2e = {parsedMetrics.calculatedCo2eTonnes} Tonnes CO2e
-                </div>
-              </div>
-
-              <button
-                onClick={handleApproveBill}
-                className="w-full bg-slate-900 hover:bg-slate-800 text-lime-400 font-extrabold py-3 rounded-xl text-xs transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>APPROVE & PERSIST TO CARBON ENGINE</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+            {/* Clean Direct Approval Action Button */}
+            <button
+              onClick={handleApproveBill}
+              className="w-full bg-slate-900 hover:bg-slate-800 text-lime-400 font-extrabold py-3.5 rounded-2xl text-xs transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>APPROVE & RECORD BILL IN CARBON ENGINE</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         )}
 
