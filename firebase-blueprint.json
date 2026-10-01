@@ -1,0 +1,164 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role and impact metrics",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["student", "institution_admin", "super_admin"] },
+        "institutionId": { "type": "string" },
+        "departmentId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "impactPoints": { "type": "number" },
+        "co2eAvoidedKg": { "type": "number" },
+        "level": { "type": "number" },
+        "levelName": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "name", "role"]
+    },
+    "Institution": {
+      "title": "Institution",
+      "description": "Educational institution or organization",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "location": { "type": "string" },
+        "studentCount": { "type": "number" },
+        "staffCount": { "type": "number" },
+        "baselineCo2e": { "type": "number" },
+        "targetReductionPercent": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name"]
+    },
+    "Department": {
+      "title": "Department",
+      "description": "Department within an institution",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "institutionId": { "type": "string" },
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "studentCount": { "type": "number" },
+        "staffCount": { "type": "number" },
+        "areaSqM": { "type": "number" },
+        "currentCo2eKg": { "type": "number" },
+        "reductionPercent": { "type": "number" },
+        "score": { "type": "number" }
+      },
+      "required": ["id", "institutionId", "name"]
+    },
+    "Journey": {
+      "title": "Journey",
+      "description": "Tracked travel journey with GPS verification and carbon math",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "institutionId": { "type": "string" },
+        "origin": { "type": "string" },
+        "destination": { "type": "string" },
+        "transportMode": { "type": "string" },
+        "distanceKm": { "type": "number" },
+        "durationMin": { "type": "number" },
+        "actualCo2e": { "type": "number" },
+        "alternativeCo2e": { "type": "number" },
+        "avoidedCo2e": { "type": "number" },
+        "impactPointsEarned": { "type": "number" },
+        "verificationStatus": { "type": "string", "enum": ["VERIFIED", "ESTIMATED", "PENDING"] },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "userId", "transportMode", "distanceKm"]
+    },
+    "CarbonActivity": {
+      "title": "CarbonActivity",
+      "description": "Single carbon activity record for individual or campus",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "institutionId": { "type": "string" },
+        "departmentId": { "type": "string" },
+        "category": { "type": "string" },
+        "activityType": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unit": { "type": "string" },
+        "co2eKg": { "type": "number" },
+        "source": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "category", "quantity", "co2eKg"]
+    },
+    "UtilityBill": {
+      "title": "UtilityBill",
+      "description": "Uploaded utility bill record with OCR metadata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "institutionId": { "type": "string" },
+        "departmentId": { "type": "string" },
+        "billingPeriod": { "type": "string" },
+        "kwhConsumed": { "type": "number" },
+        "billAmount": { "type": "number" },
+        "ocrStatus": { "type": "string" },
+        "verificationStatus": { "type": "string" },
+        "co2eKg": { "type": "number" },
+        "uploadedAt": { "type": "string" }
+      },
+      "required": ["id", "institutionId", "kwhConsumed"]
+    },
+    "UserReward": {
+      "title": "UserReward",
+      "description": "Redeemed campus coupon for user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "rewardId": { "type": "string" },
+        "couponCode": { "type": "string" },
+        "title": { "type": "string" },
+        "pointsSpent": { "type": "number" },
+        "status": { "type": "string", "enum": ["AVAILABLE", "REDEEMED", "EXPIRED"] },
+        "redeemedAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "couponCode"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/institutions/{institutionId}": {
+      "schema": "Institution",
+      "description": "Institutions"
+    },
+    "/departments/{departmentId}": {
+      "schema": "Department",
+      "description": "Departments"
+    },
+    "/journeys/{journeyId}": {
+      "schema": "Journey",
+      "description": "Tracked student journeys"
+    },
+    "/carbonActivities/{activityId}": {
+      "schema": "CarbonActivity",
+      "description": "Carbon activity tracking"
+    },
+    "/utilityBills/{billId}": {
+      "schema": "UtilityBill",
+      "description": "Utility bill OCR uploads"
+    },
+    "/userRewards/{userRewardId}": {
+      "schema": "UserReward",
+      "description": "Redeemed reward coupons"
+    }
+  }
+}

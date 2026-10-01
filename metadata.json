@@ -1,0 +1,6 @@
+{
+  "name": "CarbonConnect",
+  "description": "Institutional & Individual Carbon Intelligence Platform. Track carbon, reduce emissions, OCR utility bills, run what-if simulations, and earn impact rewards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
