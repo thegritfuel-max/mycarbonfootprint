@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { RewardItem, UserRewardRecord } from '../types';
-import { Gift, Coffee, Printer, Utensils, Award, Sparkles, Check, QrCode } from 'lucide-react';
+import { Gift, Coffee, Printer, Utensils, Award, Sparkles, QrCode } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import confetti from 'canvas-confetti';
 
 interface RewardStoreProps {
@@ -31,7 +32,7 @@ export const RewardStore: React.FC<RewardStoreProps> = ({
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-20 lg:pb-8">
+    <div className="space-y-6 max-w-5xl mx-auto pb-20 lg:pb-8 font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-slate-900 to-emerald-950 rounded-3xl p-6 sm:p-8 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl border border-slate-800">
         <div>
@@ -43,7 +44,7 @@ export const RewardStore: React.FC<RewardStoreProps> = ({
             Redeem Your Carbon Impact Points
           </h1>
           <p className="text-slate-300 text-sm mt-1 max-w-md leading-relaxed">
-            Exchange your verified avoided CO2e points for campus canteen coupons, printing discounts, and official sustainability certificates.
+            Exchange your verified avoided CO2e points for canteen coupons, library printing discounts, and official sustainability certificates.
           </p>
         </div>
 
@@ -138,10 +139,10 @@ export const RewardStore: React.FC<RewardStoreProps> = ({
 
                 <button
                   onClick={() => setSelectedCoupon(urew)}
-                  className="p-2.5 rounded-xl bg-white border border-lime-300 text-emerald-800 hover:bg-lime-100 transition-colors shrink-0 cursor-pointer"
-                  title="Show QR Code"
+                  className="p-2.5 rounded-xl bg-white border border-lime-300 text-emerald-800 hover:bg-lime-100 transition-colors shrink-0 cursor-pointer flex items-center gap-1.5 text-xs font-bold"
                 >
-                  <QrCode className="w-5 h-5 text-emerald-700" />
+                  <QrCode className="w-4 h-4 text-emerald-700" />
+                  <span>Show QR</span>
                 </button>
               </div>
             ))}
@@ -149,18 +150,24 @@ export const RewardStore: React.FC<RewardStoreProps> = ({
         </div>
       )}
 
-      {/* QR Code Modal for Merchant Scanning */}
+      {/* Real Scannable QR Code Modal */}
       {selectedCoupon && (
         <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl animate-scaleIn">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl relative border border-slate-100">
             <h3 className="font-['Syne'] text-lg font-bold text-slate-900">{selectedCoupon.title}</h3>
-            <p className="text-xs text-slate-500">Show this QR code at {selectedCoupon.merchant} to redeem.</p>
+            <p className="text-xs text-slate-500">Scan at {selectedCoupon.merchant} to verify coupon.</p>
 
-            <div className="w-48 h-48 mx-auto bg-slate-900 p-3 rounded-2xl flex items-center justify-center">
-              <div className="w-full h-full bg-white rounded-xl p-3 flex flex-col items-center justify-center border-4 border-slate-900">
-                <QrCode className="w-28 h-28 text-slate-900" />
-                <span className="text-[10px] font-mono font-bold text-slate-800 mt-1">{selectedCoupon.couponCode}</span>
-              </div>
+            <div className="p-4 bg-slate-50 border-2 border-emerald-500/20 rounded-2xl inline-block mx-auto shadow-inner">
+              <QRCodeSVG
+                value={`CARBONCONNECT-COUPON:${selectedCoupon.couponCode}:${selectedCoupon.merchant}`}
+                size={180}
+                level="H"
+                bgColor="#FFFFFF"
+                fgColor="#0F172A"
+              />
+              <span className="text-xs font-mono font-bold text-slate-900 block mt-2 tracking-wider">
+                {selectedCoupon.couponCode}
+              </span>
             </div>
 
             <button

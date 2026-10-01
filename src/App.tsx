@@ -319,13 +319,12 @@ export default function App() {
             )}
 
             {activeTab === 'ocr' && (
-              <div className="text-center py-12">
-                <button
-                  onClick={() => setIsOcrModalOpen(true)}
-                  className="bg-slate-900 text-lime-400 font-bold px-6 py-3 rounded-2xl text-sm shadow-md"
-                >
-                  Open Utility Bill OCR Scanner
-                </button>
+              <div className="max-w-3xl mx-auto py-4">
+                <UtilityBillOcrModal
+                  isOpen={true}
+                  onClose={() => setActiveTab('campus')}
+                  onBillApproved={handleBillApproved}
+                />
               </div>
             )}
 
