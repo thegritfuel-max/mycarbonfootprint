@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DepartmentData, UtilityBillRecord } from '../types';
-import { Building2, ArrowDownRight, Zap, Bus, Gauge, Utensils, Laptop, ScanLine, BarChart3, MapPin, ChevronRight, FileText, Filter, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Building2, ArrowDownRight, Zap, Bus, Gauge, Utensils, Laptop, ScanLine, BarChart3, MapPin, Filter, TrendingUp, Calendar } from 'lucide-react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface InstitutionDashboardProps {
   departments: DepartmentData[];
@@ -10,6 +11,16 @@ interface InstitutionDashboardProps {
   onOpenMap: () => void;
   onSelectDepartment?: (dept: DepartmentData) => void;
 }
+
+// Historical 6-Month CO2e Data per Department (Tonnes CO2e)
+const HISTORICAL_MONTHLY_TRENDS = [
+  { month: 'Apr', CSE: 14.2, Civil: 11.5, ETC: 9.8, Mech: 12.1 },
+  { month: 'May', CSE: 13.8, Civil: 11.2, ETC: 9.5, Mech: 11.8 },
+  { month: 'Jun', CSE: 12.9, Civil: 10.6, ETC: 9.1, Mech: 11.0 },
+  { month: 'Jul', CSE: 12.1, Civil: 10.1, ETC: 8.7, Mech: 10.5 },
+  { month: 'Aug', CSE: 11.8, Civil: 9.8,  ETC: 8.4, Mech: 10.1 },
+  { month: 'Sep', CSE: 11.2, Civil: 9.4,  ETC: 8.1, Mech: 9.8 },
+];
 
 export const InstitutionDashboard: React.FC<InstitutionDashboardProps> = ({
   departments,
@@ -24,7 +35,6 @@ export const InstitutionDashboard: React.FC<InstitutionDashboardProps> = ({
     ? null
     : departments.find((d) => d.id === selectedDeptId);
 
-  // Aggregated or Department-Specific Calculations
   const activeDepts = selectedDepartment ? [selectedDepartment] : departments;
 
   const totalStudents = activeDepts.reduce((acc, d) => acc + d.studentCount, 0);
@@ -34,9 +44,8 @@ export const InstitutionDashboard: React.FC<InstitutionDashboardProps> = ({
 
   const totalCo2eTonnes = (totalCo2eKg / 1000).toFixed(2);
   const reductionPercent = (((totalBaselineCo2eKg - totalCo2eKg) / totalBaselineCo2eKg) * 100).toFixed(1);
-  const kgPerStudent = (totalCo2eKg / totalStudents).toFixed(1);
+  const kgPerStudent = (totalCampusCo2eKg: number) => (totalCampusCo2eKg / totalStudents).toFixed(1);
 
-  // Breakdown figures
   const electricityCo2eKg = activeDepts.reduce((acc, d) => acc + d.breakdown.electricityCo2eKg, 0);
   const computingCo2eKg = activeDepts.reduce((acc, d) => acc + d.breakdown.computingCo2eKg, 0);
   const acCo2eKg = activeDepts.reduce((acc, d) => acc + d.breakdown.acCo2eKg, 0);
@@ -146,7 +155,7 @@ export const InstitutionDashboard: React.FC<InstitutionDashboardProps> = ({
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Normalized Intensity</span>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-2xl font-black text-slate-900 tabular-nums">{kgPerStudent}</span>
+            <span className="text-2xl font-black text-slate-900 tabular-nums">{kgPerStudent(totalCo2eKg)}</span>
             <span className="text-xs font-bold text-slate-500">kg / student</span>
           </div>
           <span className="text-[11px] text-slate-500 block mt-1">Fair comparative standard</span>
@@ -159,6 +168,71 @@ export const InstitutionDashboard: React.FC<InstitutionDashboardProps> = ({
             <span className="text-xs font-bold text-slate-500">Active occupants</span>
           </div>
           <span className="text-[11px] text-slate-500 block mt-1">{totalStudents} Students · {totalStaff} Staff</span>
+        </div>
+      </div>
+
+      {/* RECHARTS: Historical Monthly Carbon Consumption Trends */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-emerald-600" />
+              <span>Historical Department Carbon Trends (6-Month Patterns)</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Visualizing monthly footprint trends in Tonnes CO2e per department
+            </p>
+          </div>
+
+          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg flex items-center gap-1 self-start sm:self-auto">
+            <Calendar className="w-3.5 h-3.5 text-emerald-600" /> Apr - Sep 2026 Audit
+          </span>
+        </div>
+
+        <div className="w-full h-72 pt-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={HISTORICAL_MONTHLY_TRENDS} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorCSE" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorCivil" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorETC" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorMech" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+              <XAxis dataKey="month" stroke="#64748B" fontSize={12} tickLine={false} />
+              <YAxis stroke="#64748B" fontSize={12} tickLine={false} unit="t" />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#0F172A', color: '#FFFFFF', borderRadius: '12px', border: 'none', fontSize: '12px' }}
+                itemStyle={{ color: '#F8FAFC' }}
+              />
+              <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+
+              {(selectedDeptId === 'all' || selectedDeptId === 'dept_cse_01') && (
+                <Area type="monotone" dataKey="CSE" name="Computer Science" stroke="#10B981" fillOpacity={1} fill="url(#colorCSE)" strokeWidth={2.5} />
+              )}
+              {(selectedDeptId === 'all' || selectedDeptId === 'dept_civil_01') && (
+                <Area type="monotone" dataKey="Civil" name="Civil Engineering" stroke="#3B82F6" fillOpacity={1} fill="url(#colorCivil)" strokeWidth={2.5} />
+              )}
+              {(selectedDeptId === 'all' || selectedDeptId === 'dept_etc_01') && (
+                <Area type="monotone" dataKey="ETC" name="Electronics & TC" stroke="#F59E0B" fillOpacity={1} fill="url(#colorETC)" strokeWidth={2.5} />
+              )}
+              {(selectedDeptId === 'all' || selectedDeptId === 'dept_mech_01') && (
+                <Area type="monotone" dataKey="Mech" name="Mechanical Eng" stroke="#8B5CF6" fillOpacity={1} fill="url(#colorMech)" strokeWidth={2.5} />
+              )}
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
